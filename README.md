@@ -1,20 +1,21 @@
-# json_schema_parse
+# to_be_defined
 
-[![Package Version](https://img.shields.io/hexpm/v/json_schema_parse)](https://hex.pm/packages/json_schema_parse)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/json_schema_parse/)
+[![Package Version](https://img.shields.io/hexpm/v/to_be_defined)](https://hex.pm/packages/to_be_defined)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/to_be_defined/)
 
 ```sh
-gleam add json_schema_parse@1
+gleam add to_be_defined@1
 ```
+
 ```gleam
-import json_schema_parse
+import to_be_defined
 
 pub fn main() {
   // TODO: An example of the project in use
 }
 ```
 
-Further documentation can be found at <https://hexdocs.pm/json_schema_parse>.
+Further documentation can be found at <https://hexdocs.pm/to_be_defined>.
 
 ## Development
 
