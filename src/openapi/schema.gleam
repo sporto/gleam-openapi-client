@@ -12,7 +12,12 @@ pub type Schema {
 }
 
 pub fn decode_string(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
-  Ok(SchemaString)
+  let enum_result = dynamic.field("enum", dynamic.list(dynamic.string))(json)
+
+  case enum_result {
+    Ok(enum) -> Ok(SchemaEnum(enum))
+    Error(_) -> Ok(SchemaString)
+  }
 }
 
 pub fn decoder(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
