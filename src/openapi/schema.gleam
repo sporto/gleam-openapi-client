@@ -20,7 +20,9 @@ pub fn decode_string(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
   }
 }
 
-pub fn decoder(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
+pub fn decoder_non_nullable(
+  json: Dynamic,
+) -> Result(Schema, dynamic.DecodeErrors) {
   use type_ <- result.try(dynamic.field("type", dynamic.string)(json))
 
   case type_ {
@@ -31,6 +33,15 @@ pub fn decoder(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
           "type",
         ]),
       ])
+  }
+}
+
+pub fn decoder(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
+  let nullable_result = dynamic.field("nullable", dynamic.bool)(json)
+
+  case nullable_result {
+    Ok(True) -> decoder_non_nullable(json) |> result.map(SchemaNullable)
+    _ -> decoder_non_nullable(json)
   }
 }
 
