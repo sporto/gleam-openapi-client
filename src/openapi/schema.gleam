@@ -11,6 +11,10 @@ pub type Schema {
   SchemaEnum(List(String))
 }
 
+pub fn decode_array(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
+  dynamic.decode1(SchemaArray, dynamic.field("items", decoder))(json)
+}
+
 pub fn decode_object(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
   dynamic.decode1(
     SchemaObject,
@@ -33,6 +37,7 @@ pub fn decoder_non_nullable(
   use type_ <- result.try(dynamic.field("type", dynamic.string)(json))
 
   case type_ {
+    "array" -> decode_array(json)
     "object" -> decode_object(json)
     "string" -> decode_string(json)
     _ ->

@@ -1,6 +1,8 @@
 import gleam/dict
 import gleeunit/should
-import openapi/schema.{SchemaEnum, SchemaNullable, SchemaObject, SchemaString}
+import openapi/schema.{
+  SchemaArray, SchemaEnum, SchemaNullable, SchemaObject, SchemaString,
+}
 
 pub fn parse_string_test() {
   let json = "{\"type\":\"string\"}"
@@ -12,6 +14,19 @@ pub fn parse_string_nullable_test() {
   let json = "{\"type\":\"string\", \"nullable\": true}"
   let parsed = schema.parse(json)
   parsed |> should.equal(Ok(SchemaNullable(SchemaString)))
+}
+
+pub fn parse_string_array_test() {
+  let json =
+    "{
+    \"type\":\"array\",
+    \"items\": {
+      \"type\":\"string\"
+    }
+  }"
+
+  let parsed = schema.parse(json)
+  parsed |> should.equal(Ok(SchemaArray(SchemaString)))
 }
 
 pub fn parse_enum_test() {
