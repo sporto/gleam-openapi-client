@@ -1,14 +1,21 @@
+import gleam/dict.{type Dict}
 import gleam/dynamic.{type Dynamic}
-import gleam/io
 import gleam/json
 import gleam/result
 
 pub type Schema {
   SchemaString
-  SchemaObject
+  SchemaObject(properties: Dict(String, Schema))
   SchemaArray(Schema)
   SchemaNullable(Schema)
   SchemaEnum(List(String))
+}
+
+pub fn decode_object(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
+  dynamic.decode1(
+    SchemaObject,
+    dynamic.field("properties", dynamic.dict(dynamic.string, decoder)),
+  )(json)
 }
 
 pub fn decode_string(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
@@ -26,6 +33,7 @@ pub fn decoder_non_nullable(
   use type_ <- result.try(dynamic.field("type", dynamic.string)(json))
 
   case type_ {
+    "object" -> decode_object(json)
     "string" -> decode_string(json)
     _ ->
       Error([
@@ -37,6 +45,7 @@ pub fn decoder_non_nullable(
 }
 
 pub fn decoder(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
+  // OpenAPI 3.0 uses nullable
   let nullable_result = dynamic.field("nullable", dynamic.bool)(json)
 
   case nullable_result {
