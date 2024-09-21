@@ -1,22 +1,49 @@
 import gleam/dict
 import gleeunit/should
 import openapi/schema.{
-  SchemaArray, SchemaEnum, SchemaNullable, SchemaObject, SchemaString,
+  SchemaArray, SchemaBoolean, SchemaEnum, SchemaInteger, SchemaNullable,
+  SchemaNumber, SchemaObject, SchemaString,
 }
 
-pub fn parse_string_test() {
+pub fn decode_boolean_test() {
+  let json = "{\"type\":\"boolean\"}"
+  let decoded = schema.decode(json)
+  decoded |> should.equal(Ok(SchemaBoolean))
+}
+
+pub fn decode_integer_test() {
+  let json =
+    "{
+    \"type\":\"integer\"
+    }"
+
+  let decoded = schema.decode(json)
+  decoded |> should.equal(Ok(SchemaInteger))
+}
+
+pub fn decode_number_test() {
+  let json =
+    "{
+    \"type\":\"number\"
+    }"
+
+  let decoded = schema.decode(json)
+  decoded |> should.equal(Ok(SchemaNumber))
+}
+
+pub fn decode_string_test() {
   let json = "{\"type\":\"string\"}"
-  let parsed = schema.parse(json)
-  parsed |> should.equal(Ok(SchemaString))
+  let decoded = schema.decode(json)
+  decoded |> should.equal(Ok(SchemaString))
 }
 
-pub fn parse_string_nullable_test() {
+pub fn decode_nullable_string_test() {
   let json = "{\"type\":\"string\", \"nullable\": true}"
-  let parsed = schema.parse(json)
-  parsed |> should.equal(Ok(SchemaNullable(SchemaString)))
+  let decoded = schema.decode(json)
+  decoded |> should.equal(Ok(SchemaNullable(SchemaString)))
 }
 
-pub fn parse_string_array_test() {
+pub fn decode_string_array_test() {
   let json =
     "{
     \"type\":\"array\",
@@ -25,17 +52,31 @@ pub fn parse_string_array_test() {
     }
   }"
 
-  let parsed = schema.parse(json)
-  parsed |> should.equal(Ok(SchemaArray(SchemaString)))
+  let decoded = schema.decode(json)
+  decoded |> should.equal(Ok(SchemaArray(SchemaString)))
 }
 
-pub fn parse_enum_test() {
+pub fn decode_nullable_string_array_test() {
+  let json =
+    "{
+    \"type\":\"array\",
+    \"nullable\": true,
+    \"items\": {
+      \"type\":\"string\"
+    }
+  }"
+
+  let decoded = schema.decode(json)
+  decoded |> should.equal(Ok(SchemaNullable(SchemaArray(SchemaString))))
+}
+
+pub fn decode_enum_test() {
   let json = "{\"type\":\"string\", \"enum\": [\"red\", \"blue\"]}"
-  let parsed = schema.parse(json)
-  parsed |> should.equal(Ok(SchemaEnum(["red", "blue"])))
+  let decoded = schema.decode(json)
+  decoded |> should.equal(Ok(SchemaEnum(["red", "blue"])))
 }
 
-pub fn parse_object_test() {
+pub fn decode_object_test() {
   let json =
     "{
     \"type\":\"object\",
@@ -46,7 +87,7 @@ pub fn parse_object_test() {
     }
   }"
 
-  let parsed = schema.parse(json)
+  let decoded = schema.decode(json)
   let props = [#("name", SchemaString)] |> dict.from_list
-  parsed |> should.equal(Ok(SchemaObject(props)))
+  decoded |> should.equal(Ok(SchemaObject(props)))
 }

@@ -4,15 +4,30 @@ import gleam/json
 import gleam/result
 
 pub type Schema {
-  SchemaString
-  SchemaObject(properties: Dict(String, Schema))
+  SchemaBoolean
   SchemaArray(Schema)
-  SchemaNullable(Schema)
   SchemaEnum(List(String))
+  SchemaInteger
+  SchemaNullable(Schema)
+  SchemaNumber
+  SchemaObject(properties: Dict(String, Schema))
+  SchemaString
 }
 
 pub fn decode_array(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
   dynamic.decode1(SchemaArray, dynamic.field("items", decoder))(json)
+}
+
+pub fn decode_boolean(_json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
+  Ok(SchemaBoolean)
+}
+
+pub fn decode_integer(_json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
+  Ok(SchemaInteger)
+}
+
+pub fn decode_number(_json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
+  Ok(SchemaNumber)
 }
 
 pub fn decode_object(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
@@ -38,6 +53,9 @@ pub fn decoder_non_nullable(
 
   case type_ {
     "array" -> decode_array(json)
+    "boolean" -> decode_boolean(json)
+    "integer" -> decode_integer(json)
+    "number" -> decode_number(json)
     "object" -> decode_object(json)
     "string" -> decode_string(json)
     _ ->
@@ -59,6 +77,6 @@ pub fn decoder(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
   }
 }
 
-pub fn parse(json_string: String) {
+pub fn decode(json_string: String) {
   json.decode(from: json_string, using: decoder)
 }
