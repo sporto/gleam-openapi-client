@@ -11,6 +11,7 @@ pub type Schema {
   SchemaNullable(Schema)
   SchemaNumber
   SchemaObject(properties: Dict(String, Schema))
+  SchemaRef(String)
   SchemaString
 }
 
@@ -68,12 +69,19 @@ pub fn decoder_non_nullable(
 }
 
 pub fn decoder(json: Dynamic) -> Result(Schema, dynamic.DecodeErrors) {
-  // OpenAPI 3.0 uses nullable
-  let nullable_result = dynamic.field("nullable", dynamic.bool)(json)
+  let ref_result = dynamic.field("$ref", dynamic.string)(json)
 
-  case nullable_result {
-    Ok(True) -> decoder_non_nullable(json) |> result.map(SchemaNullable)
-    _ -> decoder_non_nullable(json)
+  case ref_result {
+    Ok(ref) -> Ok(SchemaRef(ref))
+    Error(_) -> {
+      // OpenAPI 3.0 uses nullable
+      let nullable_result = dynamic.field("nullable", dynamic.bool)(json)
+
+      case nullable_result {
+        Ok(True) -> decoder_non_nullable(json) |> result.map(SchemaNullable)
+        _ -> decoder_non_nullable(json)
+      }
+    }
   }
 }
 

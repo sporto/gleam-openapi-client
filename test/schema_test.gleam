@@ -2,7 +2,7 @@ import gleam/dict
 import gleeunit/should
 import openapi/schema.{
   SchemaArray, SchemaBoolean, SchemaEnum, SchemaInteger, SchemaNullable,
-  SchemaNumber, SchemaObject, SchemaString,
+  SchemaNumber, SchemaObject, SchemaRef, SchemaString,
 }
 
 pub fn decode_boolean_test() {
@@ -90,4 +90,14 @@ pub fn decode_object_test() {
   let decoded = schema.decode(json)
   let props = [#("name", SchemaString)] |> dict.from_list
   decoded |> should.equal(Ok(SchemaObject(props)))
+}
+
+pub fn decode_ref_test() {
+  let json =
+    "{
+    \"$ref\":\"#/components/schemas/Address\"
+  }"
+
+  let decoded = schema.decode(json)
+  decoded |> should.equal(Ok(SchemaRef("#/components/schemas/Address")))
 }
